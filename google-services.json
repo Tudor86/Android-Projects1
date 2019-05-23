@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "539865417988",
+    "firebase_url": "https://speechrecognizer-7bc94.firebaseio.com",
+    "project_id": "speechrecognizer-7bc94",
+    "storage_bucket": "speechrecognizer-7bc94.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539865417988:android:98a44ddca764fac3",
+        "android_client_info": {
+          "package_name": "com.example.speechrecognizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539865417988-1igs7le3j08bnjlsn1jnsnu7kum7cg3e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.speechrecognizer",
+            "certificate_hash": "1d958c0f6dfdf963d3607d63bc8565a0b406d4e1"
+          }
+        },
+        {
+          "client_id": "539865417988-arpeu9oqdsigl4qedgqefcrc3m78o358.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChlm5L9BGAZhHElOD8pf80zkGbNDtRXvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539865417988-arpeu9oqdsigl4qedgqefcrc3m78o358.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
