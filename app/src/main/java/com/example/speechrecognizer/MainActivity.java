@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnSpeak1,btnSpeak2,btnSpeak3,btnSend;
     SpeechRecognizer mSpeechRecognizer;
     Intent mSpeechRecognizerIntent;
+    int lastPressed;
 
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
@@ -99,8 +100,20 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
                 if (matches != null)
-                    editText2.setText(matches.get(0));
+                    switch (lastPressed) {
+                        case 1:
+                            editText1.setText(matches.get(0));
+                            break;
+                        case 2:
+                            editText2.setText(matches.get(0));
+                            break;
+                        case 3:
+                            editText3.setText(matches.get(0));
+                            break;
+                        default:
+                            break;
 
+                    }
             }
 
             @Override
@@ -117,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                lastPressed=1;
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_UP:
@@ -138,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak2.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                lastPressed=2;
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_UP:
@@ -159,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak3.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                lastPressed=3;
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_UP:
