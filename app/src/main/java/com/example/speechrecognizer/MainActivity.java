@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.database.DatabaseReference;
@@ -102,13 +103,15 @@ public class MainActivity extends AppCompatActivity {
                 if (matches != null)
                     switch (lastPressed) {
                         case 1:
-                            editText1.setText(matches.get(0));
+                            processText(matches.get(0),1);
+                            editText1.setText(processText(matches.get(0),1));
                             break;
                         case 2:
-                            editText2.setText(matches.get(0));
+                            processText(matches.get(0),1);
+                            editText2.setText(processText(matches.get(0),2));
                             break;
                         case 3:
-                            editText3.setText(matches.get(0));
+                            editText3.setText(processText(matches.get(0),3));
                             break;
                         default:
                             break;
@@ -135,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText1.setHint("Insert the value");
+                        editText1.setHint("Value( ex. lei25.3 , or $13.26)");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
@@ -147,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
                 return false;
             }
+
         });
 
         btnSpeak2.setOnTouchListener(new View.OnTouchListener() {
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText2.setHint("Insert the name");
+                        editText2.setHint("Name");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
@@ -179,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText3.setHint("Insert the date");
+                        editText3.setHint("Date(ex. 02.07.2019)");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
@@ -198,12 +202,60 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                Bon bon=new Bon(editText1.getText().toString(),editText2.getText().toString(),editText3.getText().toString());
 
-        mFirebaseDatabase.child("nume1").setValue("valoareMaree2e");
+        mFirebaseDatabase.push().setValue(bon);
+        //mFirebaseDatabase.setValue(bon);
+                Toast.makeText(getApplicationContext(),"Sent to database!", Toast.LENGTH_SHORT).show();
+                editText1.setText("");
+                editText2.setText("");
+                editText3.setText("");
 
             }
         });
 
+    }
+
+    public String processText(String text,int numar){
+        if(numar==1)
+        {
+            text=text.toLowerCase();
+            text=text.trim();
+            if(text.contains("l")) {
+                text = text.replaceAll("[^\\d.]", "");
+                text=text.trim();
+                text="lei"+text;
+            }
+
+            return text;
+        }
+        if (numar==2)
+            return text;
+
+        if(numar==3)
+        {
+            text=text.toLowerCase();
+            text=text.replace(" ",".");
+            text=text.replace("january","01");
+            text=text.replace("february","02");
+            text=text.replace("march","03");
+            text=text.replace("april","04");
+            text=text.replace("may","05");
+            text=text.replace("june","06");
+            text=text.replace("july","07");
+            text=text.replace("august","08");
+            text=text.replace("september","09");
+            text=text.replace("october","10");
+            text=text.replace("november","11");
+            text=text.replace("december","12");
+            text=text.replace("st","");
+            text=text.replace("nd","");
+            text=text.replace("rd","");
+            text=text.replace("th","");
+            text=text.trim();
+            return text;
+        }
+        return text;
     }
 
     private void checkPermission() {

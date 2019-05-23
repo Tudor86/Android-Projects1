@@ -56,7 +56,7 @@
                 android:layout_weight="7"
 
                 android:ems="10"
-                android:hint="Insert the name"
+                android:hint="Name"
                 android:inputType="textPersonName" />
 
             <Button
@@ -84,7 +84,7 @@
                 android:layout_weight="7"
 
                 android:ems="10"
-                android:hint="Insert the date"
+                android:hint="Date(ex. 02.07.2019)"
                 android:inputType="textPersonName" />
 
             <Button
