@@ -27,8 +27,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText;
-    Button btnSpeak,btnSend;
+    EditText editText1,editText2,editText3;
+    Button btnSpeak1,btnSpeak2,btnSpeak3,btnSend;
     SpeechRecognizer mSpeechRecognizer;
     Intent mSpeechRecognizerIntent;
 
@@ -47,8 +47,12 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabase = mFirebaseInstance.getReference();
 
 
-        editText = findViewById(R.id.editText2);
-        btnSpeak = findViewById(R.id.buttonSpeak);
+        editText1 = findViewById(R.id.editText1);
+        btnSpeak1 = findViewById(R.id.buttonSpeak1);
+        editText2 = findViewById(R.id.editText2);
+        btnSpeak2 = findViewById(R.id.buttonSpeak2);
+        editText3 = findViewById(R.id.editText3);
+        btnSpeak3 = findViewById(R.id.buttonSpeak3);
         btnSend = findViewById(R.id.buttonSend);
 
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
                 if (matches != null)
-                    editText.setText(matches.get(0));
+                    editText1.setText(matches.get(0));
 
             }
 
@@ -110,19 +114,61 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnSpeak.setOnTouchListener(new View.OnTouchListener() {
+        btnSpeak1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText.setHint("You will see the input here");
+                        editText1.setHint("Insert the value");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
-                        editText.setText("");
-                        editText.setHint("Listening...");
+                        editText1.setText("");
+                        editText1.setHint("Listening...");
+                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                        break;
+                }
+
+                return false;
+            }
+        });
+
+        btnSpeak2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_UP:
+                        mSpeechRecognizer.stopListening();
+                        editText2.setHint("Insert the name");
+                        break;
+
+                    case MotionEvent.ACTION_DOWN:
+                        editText2.setText("");
+                        editText2.setHint("Listening...");
+                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                        break;
+                }
+
+                return false;
+            }
+        });
+
+        btnSpeak3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_UP:
+                        mSpeechRecognizer.stopListening();
+                        editText3.setHint("Insert the date");
+                        break;
+
+                    case MotionEvent.ACTION_DOWN:
+                        editText3.setText("");
+                        editText3.setHint("Listening...");
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                         break;
                 }
