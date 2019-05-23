@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-        mFirebaseDatabase.child("nume1").setValue("valoareMareee");
+        mFirebaseDatabase.child("nume1").setValue("valoareMaree2e");
 
             }
         });
