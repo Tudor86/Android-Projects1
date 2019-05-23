@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
                 if (matches != null)
-                    editText1.setText(matches.get(0));
+                    editText2.setText(matches.get(0));
 
             }
 
