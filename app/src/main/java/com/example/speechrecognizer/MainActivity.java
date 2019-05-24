@@ -1,6 +1,7 @@
 package com.example.speechrecognizer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,8 +21,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
@@ -28,20 +33,36 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText1,editText2,editText3;
-    Button btnSpeak1,btnSpeak2,btnSpeak3,btnSend;
+    EditText editText1,editText2,editText3,editText4;
+    Button btnSpeak1,btnSpeak2,btnSpeak3,btnSpeak4,btnSend;
     SpeechRecognizer mSpeechRecognizer;
     Intent mSpeechRecognizerIntent;
-    int lastPressed;
+    int lastPressed,nrCopii;
 
-    private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabase,ChildrenRef;
     private FirebaseDatabase mFirebaseInstance;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
+        ChildrenRef=FirebaseDatabase.getInstance().getReference();
+
+
+
+        ChildrenRef.child("").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                nrCopii=(int)dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         checkPermission();
 
@@ -55,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak2 = findViewById(R.id.buttonSpeak2);
         editText3 = findViewById(R.id.editText3);
         btnSpeak3 = findViewById(R.id.buttonSpeak3);
+        editText4 = findViewById(R.id.editText4);
+        btnSpeak4 = findViewById(R.id.buttonSpeak4);
         btnSend = findViewById(R.id.buttonSend);
 
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -96,30 +119,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResults(Bundle results) {
-
-                ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-                if (matches != null)
-                    switch (lastPressed) {
-                        case 1:
-                            processText(matches.get(0),1);
-                            editText1.setText(processText(matches.get(0),1));
-                            break;
-                        case 2:
-                            processText(matches.get(0),1);
-                            editText2.setText(processText(matches.get(0),2));
-                            break;
-                        case 3:
-                            editText3.setText(processText(matches.get(0),3));
-                            break;
-                        default:
-                            break;
-
-                    }
-            }
-
-            @Override
             public void onPartialResults(Bundle partialResults) {
 
             }
@@ -128,8 +127,31 @@ public class MainActivity extends AppCompatActivity {
             public void onEvent(int eventType, Bundle params) {
 
             }
-        });
 
+            @Override
+            public void onResults(Bundle results) {
+
+                ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+                if (matches != null)
+                    switch (lastPressed) {
+                        case 1:
+                            editText1.setText(processText(matches.get(0),1));
+                            break;
+                        case 2:
+                            editText2.setText(processText(matches.get(0),2));
+                            break;
+                        case 3:
+                            editText3.setText(processText(matches.get(0),3));
+                            break;
+                        case 4:
+                            editText4.setText(processText(matches.get(0),4));
+                            break;
+                        default:
+                            break;
+                    }
+            }
+        });
         btnSpeak1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -138,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
-                        editText1.setHint("Value( ex. lei25.3 , or $13.26)");
+                        editText1.setHint("Value( ex.25.3lei , or $13.26)");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
@@ -197,19 +219,60 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnSpeak4.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                lastPressed=4;
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_UP:
+                        mSpeechRecognizer.stopListening();
+                        editText4.setHint("Comment");
+                        break;
+
+                    case MotionEvent.ACTION_DOWN:
+                        editText4.setText("");
+                        editText4.setHint("Listening...");
+                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                        break;
+                }
+
+                return false;
+            }
+        });
+
 
         btnSend.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Bon bon=new Bon(editText1.getText().toString(),editText2.getText().toString(),editText3.getText().toString());
+                Bon bon=new Bon(editText1.getText().toString(),editText2.getText().toString(),editText3.getText().toString(),editText4.getText().toString());
+                if( ( editText1.getText().toString() !=null && !editText1.getText().toString().isEmpty()) &&( editText2.getText().toString() !=null && !editText2.getText().toString().isEmpty()) && ( editText3.getText().toString() !=null && !editText3.getText().toString().isEmpty()))
+                {   ChildrenRef=FirebaseDatabase.getInstance().getReference();
 
-        mFirebaseDatabase.push().setValue(bon);
-        //mFirebaseDatabase.setValue(bon);
+
+
+                ChildrenRef.child("").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        nrCopii=(int)dataSnapshot.getChildrenCount();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                    mFirebaseDatabase.child("bon"+(nrCopii+1)).setValue(bon);
                 Toast.makeText(getApplicationContext(),"Sent to database!", Toast.LENGTH_SHORT).show();
                 editText1.setText("");
                 editText2.setText("");
                 editText3.setText("");
+                editText4.setText("");
+                }
+                else
+                    Toast.makeText(getApplicationContext(),"All fields must be completed!", Toast.LENGTH_SHORT).show();
+
 
             }
         });
@@ -221,11 +284,24 @@ public class MainActivity extends AppCompatActivity {
         {
             text=text.toLowerCase();
             text=text.trim();
+            if(text.contains("dollar")) {
+                text = text.replaceAll("[^\\d.]", "");
+                text=text.trim();
+                text="$"+text;
+            }
+
+            if(text.contains("euro")) {
+                text = text.replaceAll("[^\\d.]", "");
+                text=text.trim();
+                text="€"+text;
+            }
+
             if(text.contains("l")) {
                 text = text.replaceAll("[^\\d.]", "");
                 text=text.trim();
                 text="lei"+text;
             }
+
 
             return text;
         }
@@ -253,6 +329,13 @@ public class MainActivity extends AppCompatActivity {
             text=text.replace("rd","");
             text=text.replace("th","");
             text=text.trim();
+
+            try{
+            if (text.split("\\.")[0].length()<2)
+                text="0"+text;}
+            catch (Exception e){
+
+            }
             return text;
         }
         return text;
