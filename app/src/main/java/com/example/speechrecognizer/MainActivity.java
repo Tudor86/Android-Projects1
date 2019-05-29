@@ -16,8 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         ChildrenRef=FirebaseDatabase.getInstance().getReference();
-
+        checkPermission();
 
 
         ChildrenRef.child("").addValueEventListener(new ValueEventListener() {
@@ -63,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        checkPermission();
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference();
@@ -80,11 +81,38 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak4 = findViewById(R.id.buttonSpeak4);
         btnSend = findViewById(R.id.buttonSend);
 
-        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        Spinner spinner=findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.languages,android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (position) {
+                    case 0:
+                        Toast.makeText(parent.getContext(), "Spinner item 1!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        Toast.makeText(parent.getContext(), "Spinner item 2!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+                        Toast.makeText(parent.getContext(), "Spinner item 3!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                // sometimes you need nothing here
+            }
+        });
+
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
@@ -271,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
                 editText4.setText("");
                 }
                 else
-                    Toast.makeText(getApplicationContext(),"All fields must be completed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"First three fields must be completed!", Toast.LENGTH_SHORT).show();
 
 
             }
@@ -328,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
             text=text.replace("nd","");
             text=text.replace("rd","");
             text=text.replace("th","");
+            text=text.replace("of","");
             text=text.trim();
 
             try{
