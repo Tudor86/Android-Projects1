@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnSpeak1,btnSpeak2,btnSpeak3,btnSpeak4,btnSend;
     SpeechRecognizer mSpeechRecognizer;
     Intent mSpeechRecognizerIntent;
-    int lastPressed,nrCopii;
+    int lastPressed,nrCopii,selectedLanguage=1;
 
     private DatabaseReference mFirebaseDatabase,ChildrenRef;
     private FirebaseDatabase mFirebaseInstance;
@@ -51,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
-        ChildrenRef=FirebaseDatabase.getInstance().getReference();
+
         checkPermission();
 
-
+        ChildrenRef=FirebaseDatabase.getInstance().getReference();
         ChildrenRef.child("").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -92,13 +93,19 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (position) {
                     case 0:
-                        Toast.makeText(parent.getContext(), "Spinner item 1!", Toast.LENGTH_SHORT).show();
+                        selectedLanguage=1;
+                        speechRecogFunction("en-US");
+                        Toast.makeText(parent.getContext(), "English!", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
-                        Toast.makeText(parent.getContext(), "Spinner item 2!", Toast.LENGTH_SHORT).show();
+                        selectedLanguage=2;
+                        speechRecogFunction("it");
+                        Toast.makeText(parent.getContext(), "Italian!", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
-                        Toast.makeText(parent.getContext(), "Spinner item 3!", Toast.LENGTH_SHORT).show();
+                        selectedLanguage=3;
+                        speechRecogFunction("de");
+                        Toast.makeText(parent.getContext(), "German!", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -110,76 +117,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-
-        mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
-            @Override
-            public void onReadyForSpeech(Bundle params) {
-
-            }
-
-            @Override
-            public void onBeginningOfSpeech() {
-
-            }
-
-            @Override
-            public void onRmsChanged(float rmsdB) {
-
-            }
-
-            @Override
-            public void onBufferReceived(byte[] buffer) {
-
-            }
-
-            @Override
-            public void onEndOfSpeech() {
-
-            }
-
-            @Override
-            public void onError(int error) {
-
-            }
-
-            @Override
-            public void onPartialResults(Bundle partialResults) {
-
-            }
-
-            @Override
-            public void onEvent(int eventType, Bundle params) {
-
-            }
-
-            @Override
-            public void onResults(Bundle results) {
-
-                ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-                if (matches != null)
-                    switch (lastPressed) {
-                        case 1:
-                            editText1.setText(processText(matches.get(0),1));
-                            break;
-                        case 2:
-                            editText2.setText(processText(matches.get(0),2));
-                            break;
-                        case 3:
-                            editText3.setText(processText(matches.get(0),3));
-                            break;
-                        case 4:
-                            editText4.setText(processText(matches.get(0),4));
-                            break;
-                        default:
-                            break;
-                    }
-            }
-        });
         btnSpeak1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -305,6 +242,91 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    void speechRecogFunction(String language)
+    {
+        try{
+        mSpeechRecognizer.destroy();
+        mSpeechRecognizer=null;
+        mSpeechRecognizerIntent=null;
+    } catch (Exception e){
+        Log.d("distrus","intrat");
+    }
+
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
+        mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        //mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, language);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, language);
+        mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+                Toast.makeText(getApplicationContext(),"Intrat in onReadyForSpeech!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+                Toast.makeText(getApplicationContext(),"Intrat in onBeginningOfSpeech!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRmsChanged(float rmsdB) {
+                // Toast.makeText(getApplicationContext(),"Intrat in onRmsChanged!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+                Toast.makeText(getApplicationContext(),"Intrat in onBufferReceived!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                Toast.makeText(getApplicationContext(),"Intrat in onEndOfSpeech!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(int error) {
+                Toast.makeText(getApplicationContext(),"Intrat in onResults!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+                Toast.makeText(getApplicationContext(),"Intrat in onResults!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+                Toast.makeText(getApplicationContext(),"Intrat in onResults!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResults(Bundle results) {
+
+                Toast.makeText(getApplicationContext(),"Intrat in onResults!", Toast.LENGTH_SHORT).show();
+
+                ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+                if (matches != null)
+                    switch (lastPressed) {
+                        case 1:
+                            editText1.setText(processText(matches.get(0),1));
+                            break;
+                        case 2:
+                            editText2.setText(processText(matches.get(0),2));
+                            break;
+                        case 3:
+                            editText3.setText(processText(matches.get(0),3));
+                            break;
+                        case 4:
+                            editText4.setText(processText(matches.get(0),4));
+                            break;
+                        default:
+                            break;
+                    }
+            }
+        });
     }
 
     public String processText(String text,int numar){
